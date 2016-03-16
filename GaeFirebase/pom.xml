@@ -39,6 +39,11 @@
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
+        <dependency>
+          <groupId>com.firebase</groupId>
+          <artifactId>firebase-client-jvm</artifactId>
+          <version>[1.0.8,)</version>
+        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
