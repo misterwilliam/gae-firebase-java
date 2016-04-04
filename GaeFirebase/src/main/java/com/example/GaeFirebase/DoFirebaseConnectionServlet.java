@@ -19,22 +19,8 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
 
   @Override
   public void init() throws ServletException {
-    ServletContext context = this.getServletContext();
-    try {
-      InputStream inputStream = context.getResourceAsStream(
-        "/secrets.properties");
-      if (inputStream == null) {
-        System.out.println("No file there");
-      } else {
-        Properties props = new Properties();
-        props.load(inputStream);
-        System.out.println(props.getProperty("firebaseSecret"));
-      }
-    } catch (java.net.MalformedURLException e) {
-      System.out.println("Invalid path to secrets: " + e.getMessage());
-    } catch (IOException e) {
-      System.out.println("Input stream error: " + e.getMessage());
-    }
+    Properties props = this.getConfigProperties("/secrets.properties");
+    System.out.println(props.getProperty("firebaseSecret"));
   }
 
   @Override
@@ -55,6 +41,22 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
         System.out.println("The read failed: " + firebaseError.getMessage());
       }
     });
+  }
 
+  private Properties getConfigProperties(String path) {
+    Properties props = new Properties();
+    try {
+      ServletContext context = this.getServletContext();
+      InputStream inputStream = context.getResourceAsStream(path);
+      if (inputStream == null) {
+        throw new RuntimeException("Missing file /GaeFirebase/src/webapp/" + path);
+      }
+      props.load(inputStream);
+    } catch (java.net.MalformedURLException e) {
+      throw new RuntimeException("Invalid path: " + path);
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading file (likely under root /GaeFirebase/src/webapp/): " + path);
+    }
+    return props;
   }
 }
