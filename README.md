@@ -5,4 +5,10 @@ Sample project to connect a GAE app to Firebase.
 ```
 $ cd GaeFirebase
 $ mvn appengine:devserver
-````
+```
+
+# Deploy
+```
+$ cd GaeFirebase
+$ mvn appengine:update
+```
