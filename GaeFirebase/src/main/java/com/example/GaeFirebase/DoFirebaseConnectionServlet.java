@@ -1,7 +1,11 @@
 package com.example.GaeFirebase;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -34,11 +38,14 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     resp.setContentType("text/plain");
     resp.getWriter().println("Hello, this is a testing servlet. \n\n");
+    
+    final DoFirebaseConnectionServlet self = this;
 
     this.fbRef.child("clients").addValueEventListener(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
         System.out.println(snapshot.getValue());
+        self.sendMessageToGaeApp("hi");
       }
 
       @Override
@@ -46,6 +53,25 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
         System.out.println("The read failed: " + firebaseError.getMessage());
       }
     });
+  }
+
+  private void sendMessageToGaeApp(String message) {
+
+    try {
+      URL url = new URL("ocalhost:9000/api/_presence/fff");
+      BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+      String line;
+
+      while ((line = reader.readLine()) != null) {
+        // ...
+      }
+      reader.close();
+
+    } catch (MalformedURLException e) {
+      // ...
+    } catch (IOException e) {
+      // ...
+    }
   }
 
   private String getFirebaseAuthToken(String secret) {
