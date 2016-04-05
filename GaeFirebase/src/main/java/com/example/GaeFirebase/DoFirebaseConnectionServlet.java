@@ -56,9 +56,8 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
   }
 
   private void sendMessageToGaeApp(String message) {
-
     try {
-      URL url = new URL("ocalhost:9000/api/_presence/fff");
+      URL url = new URL("http://localhost:9000/api/_presence/gae");
       BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
       String line;
 
@@ -68,9 +67,9 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
       reader.close();
 
     } catch (MalformedURLException e) {
-      // ...
+      System.out.println("Malformed URL");
     } catch (IOException e) {
-      // ...
+      System.out.println("IOException: " + e.getMessage());
     }
   }
 

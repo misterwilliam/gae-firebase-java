@@ -49,7 +49,12 @@
           <artifactId>firebase-token-generator</artifactId>
           <version>2.0.0</version>
         </dependency>
-
+        <dependency>
+          <groupId>com.google.api-client</groupId>
+          <artifactId>google-api-client</artifactId>
+          <version>1.19.1</version>
+        </dependency>
+  
         <!-- Test Dependencies -->
         <dependency>
             <groupId>com.google.appengine</groupId>
