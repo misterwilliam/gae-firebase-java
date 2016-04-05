@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -20,13 +21,13 @@ import com.firebase.security.token.TokenGenerator;
 
 public class DoFirebaseConnectionServlet extends HttpServlet {
 
-  private Properties props;
+  Firebase fbRef;
 
   @Override
   public void init() throws ServletException {
-    this.props = this.getConfigProperties("/secrets.properties");
-    String authToken = this.getFirebaseAuthToken(this.props.getProperty("firebaseSecret"));
-    System.out.println(authToken);
+    Properties props = this.getConfigProperties("/secrets.properties");
+    String authToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
+    this.fbRef = this.getAuthenticatedFirebaseClient("fb-channel", authToken);
   }
 
   @Override
@@ -34,8 +35,7 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
     resp.setContentType("text/plain");
     resp.getWriter().println("Hello, this is a testing servlet. \n\n");
 
-    Firebase fbRef = new Firebase("https://fb-channel.firebaseio.com/");
-    fbRef.child("clients").addValueEventListener(new ValueEventListener() {
+    this.fbRef.child("clients").addValueEventListener(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
         System.out.println(snapshot.getValue());
@@ -50,14 +50,26 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
 
   private String getFirebaseAuthToken(String secret) {
     Map<String, Object> authPayload = new HashMap<String, Object>();
-    authPayload.put("uid", "gae-java-presence-listener");
+    authPayload.put("uid", "gae-instance");
     authPayload.put("provider", "gae");
     TokenGenerator tokenGenerator = new TokenGenerator(secret);
     return tokenGenerator.createToken(authPayload);
   }
 
-  private Firebase getAuthenticatedFirebaseClient(String firebaseProjectId) {
+  private Firebase getAuthenticatedFirebaseClient(String firebaseProjectId, String token) {
     Firebase firebase = new Firebase("https://" + firebaseProjectId + ".firebaseio.com/");
+    firebase.authWithCustomToken(token, new Firebase.AuthResultHandler() {
+
+      @Override
+      public void onAuthenticationError(FirebaseError arg0) {
+        // TODO Auto-generated method stub
+      }
+
+      @Override
+      public void onAuthenticated(AuthData arg0) {
+        // TODO Auto-generated method stub
+      }
+    });
     return firebase;
   }
 
