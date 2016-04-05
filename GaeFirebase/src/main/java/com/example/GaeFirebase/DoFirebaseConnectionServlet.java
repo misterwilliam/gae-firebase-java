@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -22,13 +24,16 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.firebase.security.token.TokenGenerator;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 
 public class DoFirebaseConnectionServlet extends HttpServlet {
 
   Firebase fbRef;
+  GoogleCredential credential;
 
   @Override
   public void init() throws ServletException {
+    this.credential = this.getGoogleCredential();
     Properties props = this.getConfigProperties("/secrets.properties");
     String authToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
     this.fbRef = this.getAuthenticatedFirebaseClient("fb-channel", authToken);
@@ -58,7 +63,10 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
   private void sendMessageToGaeApp(String message) {
     try {
       URL url = new URL("http://localhost:9000/api/_presence/gae");
-      BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+      HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+      System.out.println("Token: " + this.credential.getAccessToken());
+      connection.setRequestProperty("Authorization", "Bearer " + this.credential.getAccessToken());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
       String line;
 
       while ((line = reader.readLine()) != null) {
@@ -114,5 +122,21 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
           "Error reading file (likely under root /GaeFirebase/src/webapp/): " + path);
     }
     return props;
+  }
+  
+  private GoogleCredential getGoogleCredential() {
+    // Get authentication for service account associated with this app.
+    try{
+      GoogleCredential credential = GoogleCredential.getApplicationDefault();
+      credential = credential.createScoped(
+          Collections.singletonList("https://www.googleapis.com/auth/userinfo.email"));
+      credential.refreshToken();
+      return credential;
+    } catch (IOException e) {
+      System.err.println(
+          "Unable to retrieve service account credentials. Expecting path to service account " +
+          "credentials in the environment variable GOOGLE_APPLICATION_CREDENTIALS: " + e.getMessage());
+    }
+    return null;
   }
 }

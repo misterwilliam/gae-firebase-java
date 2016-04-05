@@ -10,4 +10,7 @@
     <resource-files>
       <include path="/**.properties" />
     </resource-files>
+    <env-variables>
+        <env-var name="GOOGLE_APPLICATION_CREDENTIALS" value="gae-service-account.json" />
+    </env-variables>
 </appengine-web-app>
