@@ -1,9 +1,15 @@
+secrets.properties
+
+
 *.class
+
+# Eclipse
+.settings/
+.project
+.classpath
 
 # Ignore maven output
 target/
-
-secrets.properties
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
