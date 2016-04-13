@@ -135,7 +135,8 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
     } catch (IOException e) {
       System.err.println(
           "Unable to retrieve service account credentials. Expecting path to service account " +
-          "credentials to be /src/main/webapp/application_default_credentials.json");
+          "credentials to be /src/main/webapp/application_default_credentials.json: " +
+          e.getMessage());
     }
     return null;
   }

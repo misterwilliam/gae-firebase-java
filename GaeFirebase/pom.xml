@@ -11,7 +11,7 @@
     <properties>
         <app.id>gae-firebase-java</app.id>
         <app.version>1</app.version>
-        <appengine.version>1.9.32</appengine.version>
+        <appengine.version>1.9.34</appengine.version>
         <gcloud.plugin.version>2.0.9.74.v20150814</gcloud.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
@@ -52,7 +52,12 @@
         <dependency>
           <groupId>com.google.api-client</groupId>
           <artifactId>google-api-client</artifactId>
-          <version>1.19.1</version>
+          <version>1.21.0</version>
+        </dependency>
+        <dependency>
+          <groupId>com.google.api-client</groupId>
+          <artifactId>google-api-client-appengine</artifactId>
+          <version>1.21.0</version>
         </dependency>
   
         <!-- Test Dependencies -->
