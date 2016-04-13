@@ -135,7 +135,7 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
     } catch (IOException e) {
       System.err.println(
           "Unable to retrieve service account credentials. Expecting path to service account " +
-          "credentials in the environment variable GOOGLE_APPLICATION_CREDENTIALS: " + e.getMessage());
+          "credentials to be /src/main/webapp/application_default_credentials.json");
     }
     return null;
   }

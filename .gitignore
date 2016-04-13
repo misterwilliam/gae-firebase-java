@@ -1,4 +1,5 @@
 secrets.properties
+application_default_credentials.json
 gae-service-account.json
 
 *.class
