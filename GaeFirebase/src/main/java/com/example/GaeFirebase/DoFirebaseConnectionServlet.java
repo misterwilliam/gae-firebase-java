@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -26,11 +27,11 @@ import com.firebase.security.token.TokenGenerator;
 public class DoFirebaseConnectionServlet extends HttpServlet {
 
   Firebase fbRef;
-  AuthenticatedHttpURLConnection authenticatedConnection;
+  HttpURLConnectionAuthenticator connectionAuthenticator;
 
   @Override
   public void init() throws ServletException {
-    this.authenticatedConnection = new AuthenticatedHttpURLConnection();
+    this.connectionAuthenticator = HttpURLConnectionAuthenticator.getDefaultConnectionAuthenticator();
     Properties props = this.getConfigProperties("/secrets.properties");
     String authToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
     this.fbRef = this.getAuthenticatedFirebaseClient("fb-channel", authToken);
@@ -60,7 +61,9 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
   private void sendMessageToGaeApp(String message) {
     try {
       URL url = new URL("http://localhost:9000/api/_presence/gae");
-      InputStream inputStream = this.authenticatedConnection.get(url);
+      HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+      this.connectionAuthenticator.authenticate(connection);
+      InputStream inputStream = connection.getInputStream();
       BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
       String line;
 
