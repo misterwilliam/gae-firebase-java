@@ -1,14 +1,11 @@
 package com.example.GaeFirebase;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -25,16 +22,15 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.firebase.security.token.TokenGenerator;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 
 public class DoFirebaseConnectionServlet extends HttpServlet {
 
   Firebase fbRef;
-  GoogleCredential credential;
+  AuthenticatedHttpURLConnection authenticatedConnection;
 
   @Override
   public void init() throws ServletException {
-    this.credential = this.getServiceAccountGoogleCredential();
+    this.authenticatedConnection = new AuthenticatedHttpURLConnection();
     Properties props = this.getConfigProperties("/secrets.properties");
     String authToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
     this.fbRef = this.getAuthenticatedFirebaseClient("fb-channel", authToken);
@@ -64,11 +60,8 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
   private void sendMessageToGaeApp(String message) {
     try {
       URL url = new URL("http://localhost:9000/api/_presence/gae");
-      HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-      String token = this.credential.getAccessToken();
-      System.out.println("Token: " + token);
-      connection.setRequestProperty("Authorization", "Bearer " + token);
-      BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+      InputStream inputStream = this.authenticatedConnection.get(url);
+      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
       String line;
 
       while ((line = reader.readLine()) != null) {
@@ -124,21 +117,5 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
           "Error reading file (likely under root /GaeFirebase/src/webapp/): " + path);
     }
     return props;
-  }
-  
-  private GoogleCredential getServiceAccountGoogleCredential() {
-    try {
-      GoogleCredential credential = GoogleCredential.fromStream(
-          new FileInputStream("application_default_credentials.json"));
-      credential = credential.createScoped(
-        Collections.singletonList("https://www.googleapis.com/auth/userinfo.email"));
-      credential.refreshToken();
-      return credential;
-    } catch (IOException e) {
-      System.err.println(
-          "Unable to retrieve service account credentials. Expecting them to be in " +
-          "GaeFirebase/src/main/webapp/application_default_credentials.json: " + e.getMessage());
-    }
-    return null;
   }
 }
