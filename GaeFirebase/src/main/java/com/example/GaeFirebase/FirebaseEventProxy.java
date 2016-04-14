@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -24,8 +25,13 @@ public class FirebaseEventProxy {
   
   private Firebase fbRef;
   private HttpURLConnectionAuthenticator connectionAuthenticator;
+  private ArrayList<URL> forwardEndpoints;
 
-  public FirebaseEventProxy(ServletContext context) {
+  public FirebaseEventProxy(ServletContext context, Iterable<String> forwardEndpoints) throws MalformedURLException {
+    this.forwardEndpoints = new ArrayList<URL>();
+    for (String url : forwardEndpoints) {
+      this.forwardEndpoints.add(new URL(url));
+    }
     this.connectionAuthenticator = HttpURLConnectionAuthenticator.getDefaultConnectionAuthenticator();
     Properties props = this.getConfigProperties(context, "/secrets.properties");
     String authToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
@@ -51,18 +57,18 @@ public class FirebaseEventProxy {
   
   private void sendMessageToGaeApp(String message) {
     try {
-      URL url = new URL("http://localhost:9000/api/_presence/gae");
-      HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-      this.connectionAuthenticator.authenticate(connection);
-      InputStream inputStream = connection.getInputStream();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-      String line;
+      for (URL endpoint : this.forwardEndpoints) {
+        HttpURLConnection connection = (HttpURLConnection)endpoint.openConnection();
+        this.connectionAuthenticator.authenticate(connection);
+        InputStream inputStream = connection.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
 
-      while ((line = reader.readLine()) != null) {
-        // ...
+        while ((line = reader.readLine()) != null) {
+          // ...
+        }
+        reader.close();
       }
-      reader.close();
-
     } catch (MalformedURLException e) {
       System.out.println("Malformed URL");
     } catch (IOException e) {
