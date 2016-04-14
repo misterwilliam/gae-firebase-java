@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -75,15 +76,12 @@ public class FirebaseEventProxy {
         Map<String,Object> params = new HashMap<>();
         params.put("data", message);
         connection.setDoOutput(true);
-        connection.getOutputStream().write(this.encodeParams(params));
-        InputStream inputStream = connection.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-
-        while ((line = reader.readLine()) != null) {
-          // ...
+        OutputStream output = connection.getOutputStream();
+        output.write(this.encodeParams(params));
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+          System.out.println("Forwarding failed");
         }
-        reader.close();
       }
     } catch (MalformedURLException e) {
       System.out.println("Malformed URL: " + e.getMessage());
