@@ -1,6 +1,7 @@
 package com.example.GaeFirebase;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,7 +34,7 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
 
   @Override
   public void init() throws ServletException {
-    this.credential = this.getGoogleCredential();
+    this.credential = this.getServiceAccountGoogleCredential();
     Properties props = this.getConfigProperties("/secrets.properties");
     String authToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
     this.fbRef = this.getAuthenticatedFirebaseClient("fb-channel", authToken);
@@ -64,8 +65,9 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
     try {
       URL url = new URL("http://localhost:9000/api/_presence/gae");
       HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-      System.out.println("Token: " + this.credential.getAccessToken());
-      connection.setRequestProperty("Authorization", "Bearer " + this.credential.getAccessToken());
+      String token = this.credential.getAccessToken();
+      System.out.println("Token: " + token);
+      connection.setRequestProperty("Authorization", "Bearer " + token);
       BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
       String line;
 
@@ -124,19 +126,18 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
     return props;
   }
   
-  private GoogleCredential getGoogleCredential() {
-    // Get authentication for service account associated with this app.
-    try{
-      GoogleCredential credential = GoogleCredential.getApplicationDefault();
+  private GoogleCredential getServiceAccountGoogleCredential() {
+    try {
+      GoogleCredential credential = GoogleCredential.fromStream(
+          new FileInputStream("application_default_credentials.json"));
       credential = credential.createScoped(
-          Collections.singletonList("https://www.googleapis.com/auth/userinfo.email"));
+        Collections.singletonList("https://www.googleapis.com/auth/userinfo.email"));
       credential.refreshToken();
       return credential;
     } catch (IOException e) {
       System.err.println(
-          "Unable to retrieve service account credentials. Expecting path to service account " +
-          "credentials to be /src/main/webapp/application_default_credentials.json: " +
-          e.getMessage());
+          "Unable to retrieve service account credentials. Expecting them to be in " +
+          "GaeFirebase/src/main/webapp/application_default_credentials.json: " + e.getMessage());
     }
     return null;
   }
