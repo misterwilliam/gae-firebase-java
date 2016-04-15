@@ -1,6 +1,9 @@
 # gae-firebase-java
 Sample project to connect a GAE app to Firebase.
 
+Requires billing enabled (for Sockets).
+Requires manual instance scaling (for background threads).
+
 # Configuration
 Store firebase secrets in GaeFirebase/src/webapp/secrets.properties
 ```

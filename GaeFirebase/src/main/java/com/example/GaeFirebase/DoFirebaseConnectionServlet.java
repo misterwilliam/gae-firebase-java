@@ -16,8 +16,8 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     try {
-      this.firebaseEventProxy = new FirebaseEventProxy(this.getServletContext(),
-          Collections.singletonList("http://localhost:9000/api/_presence/gae"));
+      this.firebaseEventProxy = new FirebaseEventProxy(
+          Collections.singletonList("http://gae-firebase-c4d3c.appspot.com/api/_presence/gae"));
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }

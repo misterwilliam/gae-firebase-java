@@ -1,6 +1,7 @@
 package com.example.GaeFirebase;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,28 +32,30 @@ public class FirebaseEventProxy {
   private Firebase fbRef;
   private HttpURLConnectionAuthenticator connectionAuthenticator;
   private ArrayList<URL> forwardEndpoints;
+  private String firebaseAuthToken;
 
-  public FirebaseEventProxy(ServletContext context,
-                            Iterable<String> forwardEndpoints) throws MalformedURLException {
+  public FirebaseEventProxy(Iterable<String> forwardEndpoints) throws MalformedURLException {
     this.forwardEndpoints = new ArrayList<URL>();
     for (String url : forwardEndpoints) {
       this.forwardEndpoints.add(new URL(url));
     }
     this.connectionAuthenticator = HttpURLConnectionAuthenticator.getDefaultConnectionAuthenticator();
-    Properties props = this.getConfigProperties(context, "/secrets.properties");
-    String authToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
-    this.fbRef = this.getAuthenticatedFirebaseClient("fb-channel", authToken);
+    Properties props = this.getConfigProperties("secrets.properties");
+    this.firebaseAuthToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
   }
   
   public void subscribe() {
     final FirebaseEventProxy self = this;
 
+    // Thread must started from within a request?
+    this.fbRef = this.getAuthenticatedFirebaseClient("fb-channel", this.firebaseAuthToken);
     this.fbRef.child("clients").addValueEventListener(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
         if (snapshot.exists()) {
           try {
             String json = new ObjectMapper().writeValueAsString(snapshot.getValue());
+            System.out.println("Forwarding: " + json);
             self.forwardToEndpoints(json);
           } catch (JsonProcessingException e) {
             System.out.println("Invalid JSON:" + e.getMessage());
@@ -70,6 +73,7 @@ public class FirebaseEventProxy {
   private void forwardToEndpoints(String message) {
     try {
       for (URL endpoint : this.forwardEndpoints) {
+        System.out.println("Endpoint:" + endpoint.toString());
         HttpURLConnection connection = (HttpURLConnection)endpoint.openConnection();
         connection.setRequestMethod("POST");
         this.connectionAuthenticator.authenticate(connection);
@@ -126,13 +130,10 @@ public class FirebaseEventProxy {
     return firebase;
   }
   
-  private Properties getConfigProperties(ServletContext context, String path) {
+  private Properties getConfigProperties(String path) {
     Properties props = new Properties();
     try {
-      InputStream inputStream = context.getResourceAsStream(path);
-      if (inputStream == null) {
-        throw new RuntimeException("Missing file /GaeFirebase/src/webapp/" + path);
-      }
+      InputStream inputStream = new FileInputStream(path);
       props.load(inputStream);
     } catch (java.net.MalformedURLException e) {
       throw new RuntimeException("Invalid path: " + path);
