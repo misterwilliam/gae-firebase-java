@@ -2,12 +2,11 @@ package com.example.GaeFirebase;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Collections;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 
 public class HttpURLConnectionAuthenticator {
   
@@ -27,6 +26,7 @@ public class HttpURLConnectionAuthenticator {
   
   public HttpURLConnectionAuthenticator(FileInputStream fileInputStream) throws IOException {
     this(GoogleCredential.fromStream(fileInputStream));
+    System.out.println("Temp: "+ this.temp());
   }
   
   public HttpURLConnectionAuthenticator(GoogleCredential googleCredential) {
@@ -39,6 +39,15 @@ public class HttpURLConnectionAuthenticator {
     }
   }
   
+  private String getAccessToken() {
+    AppIdentityCredential credential = 
+        new AppIdentityCredential(
+            Collections.singletonList("https://www.googleapis.com/auth/userinfo.email"));
+    return credential.getAppIdentityService()
+              .getAccessToken(Collections.singletonList(
+                  "https://www.googleapis.com/auth/userinfo.email")).getAccessToken();
+    
+  }
   public void authenticate(HttpURLConnection connection) {
     String token = this.credential.getAccessToken();
     connection.setRequestProperty("Authorization", "Bearer " + token);
