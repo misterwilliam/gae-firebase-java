@@ -26,7 +26,6 @@ public class HttpURLConnectionAuthenticator {
   
   public HttpURLConnectionAuthenticator(FileInputStream fileInputStream) throws IOException {
     this(GoogleCredential.fromStream(fileInputStream));
-    System.out.println("Temp: "+ this.temp());
   }
   
   public HttpURLConnectionAuthenticator(GoogleCredential googleCredential) {
@@ -38,16 +37,7 @@ public class HttpURLConnectionAuthenticator {
       System.err.println("Unable to refresh token");
     }
   }
-  
-  private String getAccessToken() {
-    AppIdentityCredential credential = 
-        new AppIdentityCredential(
-            Collections.singletonList("https://www.googleapis.com/auth/userinfo.email"));
-    return credential.getAppIdentityService()
-              .getAccessToken(Collections.singletonList(
-                  "https://www.googleapis.com/auth/userinfo.email")).getAccessToken();
-    
-  }
+ 
   public void authenticate(HttpURLConnection connection) {
     String token = this.credential.getAccessToken();
     connection.setRequestProperty("Authorization", "Bearer " + token);
