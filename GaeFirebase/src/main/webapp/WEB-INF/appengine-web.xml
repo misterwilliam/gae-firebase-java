@@ -12,7 +12,7 @@
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
 
         <property name="GaeFireabseProxy.dev.src.urls"
-                  value="https://fb-channel.firebaseio.com"/>
+                  value="https://fb-channel.firebaseio.com/clients"/>
         <property name="GaeFireabseProxy.dev.dest.urls"
                   value="http://localhost:9000/api/_presence/gae"/>
                   

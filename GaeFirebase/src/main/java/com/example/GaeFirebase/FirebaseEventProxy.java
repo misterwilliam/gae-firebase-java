@@ -44,7 +44,6 @@ public class FirebaseEventProxy {
     
     this.watchEndpoints = new ArrayList<Firebase>();
     for (String url : watchEndpoints) {
-      System.out.println("Subscribing to: " + url);
       Firebase firebase = this.getAuthenticatedFirebaseClient(url, this.firebaseAuthToken);
       this.watchEndpoints.add(firebase);
     }
@@ -54,7 +53,8 @@ public class FirebaseEventProxy {
     final FirebaseEventProxy self = this;
 
     for (Firebase firebase : this.watchEndpoints) {
-      firebase.child("clients").addValueEventListener(new ValueEventListener() {
+      System.out.println("Subscribing to: " + firebase.toString());
+      firebase.addValueEventListener(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot snapshot) {
           if (snapshot.exists()) {
