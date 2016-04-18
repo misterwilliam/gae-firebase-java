@@ -42,20 +42,19 @@ public class FirebaseEventProxy {
     for (String url : forwardEndpoints) {
       this.forwardEndpoints.add(new URL(url));
     }
+    
     this.connectionAuthenticator = HttpURLConnectionAuthenticator.getDefaultConnectionAuthenticator();
     Properties props = this.getConfigProperties("secrets.properties");
     this.firebaseAuthToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
+
+    String watchEndpointUrl = System.getProperty("GaeFireabseProxy.watch.endpoint");
+    System.out.println("Subscribing to: " + watchEndpointUrl);
+    this.fbRef = this.getAuthenticatedFirebaseClient(watchEndpointUrl, this.firebaseAuthToken);
   }
   
   public void subscribe() {
     final FirebaseEventProxy self = this;
 
-    // Thread must started from within a request?
-    String watchEndpointUrl = System.getProperty("GaeFireabseProxy.watch.endpoint");
-    System.out.println("Subscribing to: " + watchEndpointUrl);
-    this.fbRef = this.getAuthenticatedFirebaseClient(
-        watchEndpointUrl,
-        this.firebaseAuthToken);
     this.fbRef.child("clients").addValueEventListener(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
