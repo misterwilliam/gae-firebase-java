@@ -2,6 +2,7 @@ package com.example.GaeFirebase;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.servlet.ServletException;
@@ -17,6 +18,7 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
   public void init() throws ServletException {
     try {
       this.firebaseEventProxy = new FirebaseEventProxy(
+          new ArrayList<String>(),
           Collections.singletonList("http://gae-firebase-c4d3c.appspot.com/api/_presence/gae"));
     } catch (MalformedURLException e) {
       e.printStackTrace();

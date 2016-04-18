@@ -10,6 +10,7 @@
 
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+        <property name="GaeFireabseProxy.watch.endpoint" value="https://fb-channel.firebaseio.com"/>
     </system-properties>
     <resource-files>
       <include path="/**.properties" />

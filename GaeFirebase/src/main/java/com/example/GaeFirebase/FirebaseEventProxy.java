@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -27,10 +28,16 @@ public class FirebaseEventProxy {
   
   private Firebase fbRef;
   private HttpURLConnectionAuthenticator connectionAuthenticator;
+  private ArrayList<URL> watchEndpoints;
   private ArrayList<URL> forwardEndpoints;
   private String firebaseAuthToken;
 
-  public FirebaseEventProxy(Iterable<String> forwardEndpoints) throws MalformedURLException {
+  public FirebaseEventProxy(Iterable<String> watchEndpoints,
+                            Iterable<String> forwardEndpoints) throws MalformedURLException {
+    this.watchEndpoints = new ArrayList<URL>();
+    for (String url : watchEndpoints) {
+      this.watchEndpoints.add(new URL(url));
+    }
     this.forwardEndpoints = new ArrayList<URL>();
     for (String url : forwardEndpoints) {
       this.forwardEndpoints.add(new URL(url));
@@ -44,7 +51,11 @@ public class FirebaseEventProxy {
     final FirebaseEventProxy self = this;
 
     // Thread must started from within a request?
-    this.fbRef = this.getAuthenticatedFirebaseClient("fb-channel", this.firebaseAuthToken);
+    String watchEndpointUrl = System.getProperty("GaeFireabseProxy.watch.endpoint");
+    System.out.println("Subscribing to: " + watchEndpointUrl);
+    this.fbRef = this.getAuthenticatedFirebaseClient(
+        watchEndpointUrl,
+        this.firebaseAuthToken);
     this.fbRef.child("clients").addValueEventListener(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
@@ -109,8 +120,8 @@ public class FirebaseEventProxy {
     return tokenGenerator.createToken(authPayload);
   }
   
-  private Firebase getAuthenticatedFirebaseClient(String firebaseProjectId, String token) {
-    Firebase firebase = new Firebase("https://" + firebaseProjectId + ".firebaseio.com/");
+  private Firebase getAuthenticatedFirebaseClient(String endpointUrl, String token) {
+    Firebase firebase = new Firebase(endpointUrl);
     firebase.authWithCustomToken(token, new Firebase.AuthResultHandler() {
 
       @Override
