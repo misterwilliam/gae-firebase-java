@@ -18,7 +18,7 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
   public void init() throws ServletException {
     try {
       this.firebaseEventProxy = new FirebaseEventProxy(
-          new ArrayList<String>(),
+          Collections.singletonList(System.getProperty("GaeFireabseProxy.watch.endpoint")),
           Collections.singletonList("http://gae-firebase-c4d3c.appspot.com/api/_presence/gae"));
     } catch (MalformedURLException e) {
       e.printStackTrace();

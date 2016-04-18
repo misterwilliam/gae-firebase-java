@@ -26,18 +26,13 @@ import com.firebase.security.token.TokenGenerator;
 
 public class FirebaseEventProxy {
   
-  private Firebase fbRef;
   private HttpURLConnectionAuthenticator connectionAuthenticator;
-  private ArrayList<URL> watchEndpoints;
+  private ArrayList<Firebase> watchEndpoints;
   private ArrayList<URL> forwardEndpoints;
   private String firebaseAuthToken;
 
   public FirebaseEventProxy(Iterable<String> watchEndpoints,
                             Iterable<String> forwardEndpoints) throws MalformedURLException {
-    this.watchEndpoints = new ArrayList<URL>();
-    for (String url : watchEndpoints) {
-      this.watchEndpoints.add(new URL(url));
-    }
     this.forwardEndpoints = new ArrayList<URL>();
     for (String url : forwardEndpoints) {
       this.forwardEndpoints.add(new URL(url));
@@ -46,34 +41,39 @@ public class FirebaseEventProxy {
     this.connectionAuthenticator = HttpURLConnectionAuthenticator.getDefaultConnectionAuthenticator();
     Properties props = this.getConfigProperties("secrets.properties");
     this.firebaseAuthToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
-
-    String watchEndpointUrl = System.getProperty("GaeFireabseProxy.watch.endpoint");
-    System.out.println("Subscribing to: " + watchEndpointUrl);
-    this.fbRef = this.getAuthenticatedFirebaseClient(watchEndpointUrl, this.firebaseAuthToken);
+    
+    this.watchEndpoints = new ArrayList<Firebase>();
+    for (String url : watchEndpoints) {
+      System.out.println("Subscribing to: " + url);
+      Firebase firebase = this.getAuthenticatedFirebaseClient(url, this.firebaseAuthToken);
+      this.watchEndpoints.add(firebase);
+    }
   }
   
   public void subscribe() {
     final FirebaseEventProxy self = this;
 
-    this.fbRef.child("clients").addValueEventListener(new ValueEventListener() {
-      @Override
-      public void onDataChange(DataSnapshot snapshot) {
-        if (snapshot.exists()) {
-          try {
-            String json = new ObjectMapper().writeValueAsString(snapshot.getValue());
-            System.out.println("Forwarding: " + json);
-            self.forwardToEndpoints(json);
-          } catch (JsonProcessingException e) {
-            System.out.println("Invalid JSON:" + e.getMessage());
+    for (Firebase firebase : this.watchEndpoints) {
+      firebase.child("clients").addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot snapshot) {
+          if (snapshot.exists()) {
+            try {
+              String json = new ObjectMapper().writeValueAsString(snapshot.getValue());
+              System.out.println("Forwarding: " + json);
+              self.forwardToEndpoints(json);
+            } catch (JsonProcessingException e) {
+              System.out.println("Invalid JSON:" + e.getMessage());
+            }
           }
         }
-      }
 
-      @Override
-      public void onCancelled(FirebaseError firebaseError) {
-        System.out.println("The read failed: " + firebaseError.getMessage());
-      }
-    });
+        @Override
+        public void onCancelled(FirebaseError firebaseError) {
+          System.out.println("The read failed: " + firebaseError.getMessage());
+        }
+      });
+    }
   }
   
   private void forwardToEndpoints(String message) {
