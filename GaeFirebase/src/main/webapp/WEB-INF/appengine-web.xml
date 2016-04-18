@@ -10,8 +10,16 @@
 
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
-        <property name="GaeFireabseProxy.watch.endpoint"
+
+        <property name="GaeFireabseProxy.dev.src.urls"
+                  value="https://fb-channel.firebaseio.com"/>
+        <property name="GaeFireabseProxy.dev.dest.urls"
+                  value="http://localhost:9000/api/_presence/gae"/>
+                  
+        <property name="GaeFireabseProxy.prod.src.urls"
                   value="https://fb-channel.firebaseio.com/clients"/>
+        <property name="GaeFireabseProxy.prod.dest.urls"
+                  value="http://gae-firebase-c4d3c.appspot.com/api/_presence/gae"/>
     </system-properties>
     <resource-files>
       <include path="/**.properties" />
