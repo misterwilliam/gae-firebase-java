@@ -52,6 +52,9 @@ public class FirebaseEventProxy {
         case VALUE:
           src.addValueEventListener(new ForwardingValueEventListener(forwarder));
           break;
+        default:
+          src.addChildEventListener(new ForwardingChildEventListener(forwarder, eventType));
+          break;
       }
     }
   }

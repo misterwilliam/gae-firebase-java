@@ -23,7 +23,7 @@ public class ForwardingValueEventListener implements ValueEventListener {
     if (snapshot.exists()) {
       try {
         String json = new ObjectMapper().writeValueAsString(snapshot.getValue());
-        log.info("Forwarding: " + json);
+        log.info("Forwarding value: " + json);
         this.forwarder.forward(json);
       } catch (JsonProcessingException e) {
         log.warning("Invalid JSON:" + e.getMessage());
@@ -32,7 +32,7 @@ public class ForwardingValueEventListener implements ValueEventListener {
   }
 
   @Override
-  public void onCancelled(FirebaseError firebaseError) {
-    log.warning("The read failed: " + firebaseError.getMessage());
+  public void onCancelled(FirebaseError error) {
+    log.warning("The read failed: " + error.getMessage());
   }
 }
