@@ -2,6 +2,7 @@ package com.example.GaeFirebase;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,8 +34,16 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
         destUrls = this.getSpaceSeparatedArgs(
             System.getProperty("GaeFireabseProxy.dev.dest.urls", ""));
       }
+      
+      ArrayList<Route> routes = new ArrayList<Route>();
+      for (String src : srcUrls) {
+        for (String dest : destUrls) {
+          routes.add(new Route(Collections.singletonList(Route.FirebaseEventType.VALUE),
+              new URL(src), new URL(dest)));
+        }
+      }
 
-      this.firebaseEventProxy = new FirebaseEventProxy(srcUrls, destUrls);
+      this.firebaseEventProxy = new FirebaseEventProxy(routes);
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }

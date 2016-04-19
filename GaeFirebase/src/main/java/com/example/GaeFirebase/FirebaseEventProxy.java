@@ -27,36 +27,19 @@ import com.firebase.security.token.TokenGenerator;
 public class FirebaseEventProxy {
 
   private HttpURLConnectionAuthenticator connectionAuthenticator;
-  private ArrayList<Firebase> watchEndpoints;
-  private ArrayList<URL> forwardEndpoints;
   private String firebaseAuthToken;
   private ArrayList<Route> routes;
-
-  public FirebaseEventProxy(Iterable<String> watchEndpoints, Iterable<String> forwardEndpoints)
-      throws MalformedURLException {
-    this.forwardEndpoints = new ArrayList<URL>();
-    for (String url : forwardEndpoints) {
-      this.forwardEndpoints.add(new URL(url));
+  
+  public FirebaseEventProxy(Iterable<Route> routes) {
+    this.routes = new ArrayList<Route>();
+    for (Route route : routes) {
+      this.routes.add(route);
     }
-
+    
     this.connectionAuthenticator =
         HttpURLConnectionAuthenticator.getDefaultConnectionAuthenticator();
     Properties props = this.getConfigProperties("secrets.properties");
     this.firebaseAuthToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
-
-    this.watchEndpoints = new ArrayList<Firebase>();
-    for (String dest : watchEndpoints) {
-      Firebase firebase = this.getAuthenticatedFirebaseClient(dest, this.firebaseAuthToken);
-      this.watchEndpoints.add(firebase);
-    }
-
-    this.routes = new ArrayList<Route>();
-    for (String dest : forwardEndpoints) {
-      for (String src : watchEndpoints) {
-        this.routes.add(new Route(Collections.singletonList(Route.FirebaseEventType.VALUE),
-            new URL(src), new URL(dest)));
-      }
-    }
   }
 
   public void subscribe() {
@@ -93,30 +76,6 @@ public class FirebaseEventProxy {
             }
           });
       }
-    }
-  }
-
-  private void forwardToEndpoints(String message) {
-    try {
-      for (URL endpoint : this.forwardEndpoints) {
-        System.out.println("Endpoint:" + endpoint.toString());
-        HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
-        connection.setRequestMethod("POST");
-        this.connectionAuthenticator.authenticate(connection);
-        Map<String, Object> params = new HashMap<>();
-        params.put("data", message);
-        connection.setDoOutput(true);
-        OutputStream output = connection.getOutputStream();
-        output.write(this.encodeParams(params));
-        int responseCode = connection.getResponseCode();
-        if (responseCode != 200) {
-          System.out.println("Forwarding failed");
-        }
-      }
-    } catch (MalformedURLException e) {
-      System.out.println("Malformed URL: " + e.getMessage());
-    } catch (IOException e) {
-      System.out.println("IOException: " + e.getMessage());
     }
   }
 
