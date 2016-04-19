@@ -10,10 +10,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,13 +29,16 @@ public class FirebaseEventProxy {
   private HttpURLConnectionAuthenticator connectionAuthenticator;
   private String firebaseAuthToken;
   private ArrayList<Route> routes;
-  
+  private static final Logger log = Logger.getLogger(FirebaseEventProxy.class.getName());
+
   public FirebaseEventProxy(Iterable<Route> routes) {
+    log.info("Configuring routes");
     this.routes = new ArrayList<Route>();
     for (Route route : routes) {
+      log.info(route.getSrc().toString() + " -> " + route.getDest().toString());
       this.routes.add(route);
     }
-    
+
     this.connectionAuthenticator =
         HttpURLConnectionAuthenticator.getDefaultConnectionAuthenticator();
     Properties props = this.getConfigProperties("secrets.properties");

@@ -24,17 +24,17 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
       Iterable<String> srcUrls;
       Iterable<String> destUrls;
       if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
-        srcUrls = this.getSpaceSeparatedArgs(
-            System.getProperty("GaeFireabseProxy.prod.src.urls", ""));
-        destUrls = this.getSpaceSeparatedArgs(
-            System.getProperty("GaeFireabseProxy.prod.dest.urls", ""));
+        srcUrls =
+            this.getSpaceSeparatedArgs(System.getProperty("GaeFirebaseProxy.prod.src.urls", ""));
+        destUrls =
+            this.getSpaceSeparatedArgs(System.getProperty("GaeFirebaseProxy.prod.dest.urls", ""));
       } else {
-        srcUrls = this.getSpaceSeparatedArgs(
-            System.getProperty("GaeFireabseProxy.dev.src.urls", ""));
-        destUrls = this.getSpaceSeparatedArgs(
-            System.getProperty("GaeFireabseProxy.dev.dest.urls", ""));
+        srcUrls =
+            this.getSpaceSeparatedArgs(System.getProperty("GaeFirebaseProxy.dev.src.urls", ""));
+        destUrls =
+            this.getSpaceSeparatedArgs(System.getProperty("GaeFirebaseProxy.dev.dest.urls", ""));
       }
-      
+
       ArrayList<Route> routes = new ArrayList<Route>();
       for (String src : srcUrls) {
         for (String dest : destUrls) {
@@ -53,12 +53,12 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     resp.setContentType("text/plain");
     resp.getWriter().println("Hello, this is a testing servlet. \n\n");
-    
+
     this.firebaseEventProxy.subscribe();
   }
-  
+
   private Iterable<String> getSpaceSeparatedArgs(String args) {
     return Arrays.asList(args.split(" "));
   }
- 
+
 }
