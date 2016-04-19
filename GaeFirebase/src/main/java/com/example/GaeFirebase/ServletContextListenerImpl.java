@@ -1,25 +1,20 @@
 package com.example.GaeFirebase;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import com.google.appengine.api.utils.SystemProperty;
 
-public class DoFirebaseConnectionServlet extends HttpServlet {
-
-  FirebaseEventProxy firebaseEventProxy;
+public class ServletContextListenerImpl implements ServletContextListener {
 
   @Override
-  public void init() throws ServletException {
+  public void contextInitialized(ServletContextEvent event) {
     try {
       Iterable<String> srcUrls;
       Iterable<String> destUrls;
@@ -43,22 +38,19 @@ public class DoFirebaseConnectionServlet extends HttpServlet {
         }
       }
 
-      this.firebaseEventProxy = new FirebaseEventProxy(routes);
+      FirebaseEventProxy firebaseEventProxy = new FirebaseEventProxy(routes);
+      firebaseEventProxy.subscribe();
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
   }
 
   @Override
-  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    resp.setContentType("text/plain");
-    resp.getWriter().println("Hello, this is a testing servlet. \n\n");
-
-    this.firebaseEventProxy.subscribe();
+  public void contextDestroyed(ServletContextEvent event) {
+    // App Engine does not currently invoke this method.
   }
 
   private Iterable<String> getSpaceSeparatedArgs(String args) {
     return Arrays.asList(args.split(" "));
   }
-
 }
