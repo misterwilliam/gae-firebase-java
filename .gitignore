@@ -3,6 +3,7 @@ application_default_credentials.json
 gae-service-account.json
 
 *.class
+.DS_Store
 
 # Eclipse
 .settings/

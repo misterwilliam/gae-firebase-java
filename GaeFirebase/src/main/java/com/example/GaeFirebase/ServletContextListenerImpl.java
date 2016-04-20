@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -33,8 +32,7 @@ public class ServletContextListenerImpl implements ServletContextListener {
       ArrayList<Route> routes = new ArrayList<Route>();
       for (String src : srcUrls) {
         for (String dest : destUrls) {
-          routes.add(new Route(Collections.singletonList(Route.FirebaseEventType.VALUE),
-              new URL(src), new URL(dest)));
+          routes.add(new Route(Route.FirebaseEventType.VALUE, new URL(src), new URL(dest)));
         }
       }
 
