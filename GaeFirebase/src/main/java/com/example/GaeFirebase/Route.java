@@ -35,7 +35,8 @@ public class Route {
   }
 
   public void listen(Firebase src) {
-    Forwarder forwarder = new Forwarder(this.dest, this.httpAuthenticator);
+    Forwarder forwarder = new Forwarder(this.dest, this.httpAuthenticator,
+        this.destSpec.snapshotParam, this.destSpec.previousChildNameParam);
     switch (this.event) {
       case value:
         src.addValueEventListener(new ForwardingValueEventListener(forwarder));

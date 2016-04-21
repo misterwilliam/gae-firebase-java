@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class DestSpec {
   public String url;
   public String snapshotParam;
+  public String previousChildNameParam;
 
   @Override
   public boolean equals(Object obj) {

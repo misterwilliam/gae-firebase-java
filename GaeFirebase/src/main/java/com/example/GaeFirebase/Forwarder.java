@@ -17,20 +17,25 @@ public class Forwarder {
 
   URL dest;
   HttpURLConnectionAuthenticator authenticator;
+  String snapshotParam;
+  String previousChildNameParam;
 
-  public Forwarder(URL dest, HttpURLConnectionAuthenticator authenticator) {
+  public Forwarder(URL dest, HttpURLConnectionAuthenticator authenticator, String snapshotParam,
+      String previousChildNameParam) {
     this.dest = dest;
     this.authenticator = authenticator;
+    this.snapshotParam = snapshotParam;
+    this.previousChildNameParam = previousChildNameParam;
   }
 
-  public void forward(String message) {
+  public void forward(String snapshot) {
     try {
       HttpURLConnection connection = (HttpURLConnection) dest.openConnection();
       connection.setRequestMethod("POST");
       this.authenticator.authenticate(connection);
 
       Map<String, Object> params = new HashMap<>();
-      params.put("data", message);
+      params.put(this.snapshotParam, snapshot);
       connection.setDoOutput(true);
       OutputStream output = connection.getOutputStream();
       output.write(this.encodeParams(params));
