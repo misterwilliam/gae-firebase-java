@@ -9,9 +9,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.example.GaeFirebase.ConfigService.DestSpec;
-import com.example.GaeFirebase.ConfigService.RouteSpec;
-
 public class LoadConfigServiceTest {
 
   @Test

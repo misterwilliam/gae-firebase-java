@@ -2,7 +2,7 @@ package com.example.GaeFirebase;
 
 import java.net.URL;
 
-import com.example.GaeFirebase.ConfigService.RouteSpec.FirebaseEventType;
+import com.example.GaeFirebase.RouteSpec.FirebaseEventType;
 
 public class Route {
 

@@ -2,7 +2,7 @@ package com.example.GaeFirebase;
 
 import java.util.logging.Logger;
 
-import com.example.GaeFirebase.ConfigService.RouteSpec.FirebaseEventType;
+import com.example.GaeFirebase.RouteSpec.FirebaseEventType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firebase.client.ChildEventListener;

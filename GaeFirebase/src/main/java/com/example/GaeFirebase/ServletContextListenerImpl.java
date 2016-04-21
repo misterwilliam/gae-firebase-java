@@ -7,7 +7,6 @@ import java.util.List;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import com.example.GaeFirebase.ConfigService.RouteSpec;
 import com.google.appengine.api.utils.SystemProperty;
 
 public class ServletContextListenerImpl implements ServletContextListener {
