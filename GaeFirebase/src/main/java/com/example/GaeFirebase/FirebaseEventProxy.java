@@ -33,14 +33,10 @@ public class FirebaseEventProxy {
 
   public void subscribe() {
     for (Route route : this.routes) {
-      this.subscribeToRoute(route);
+      Firebase src =
+          this.getAuthenticatedFirebaseClient(route.getSrc().toString(), this.firebaseAuthToken);
+      route.listen(src);
     }
-  }
-
-  private void subscribeToRoute(Route route) {
-    Firebase src =
-        this.getAuthenticatedFirebaseClient(route.getSrc().toString(), this.firebaseAuthToken);
-    route.listen(src);
   }
 
   private String getFirebaseAuthToken(String secret) {
