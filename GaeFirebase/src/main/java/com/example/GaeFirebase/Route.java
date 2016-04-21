@@ -2,11 +2,9 @@ package com.example.GaeFirebase;
 
 import java.net.URL;
 
-public class Route {
+import com.example.GaeFirebase.ConfigService.RouteSpec.FirebaseEventType;
 
-  public enum FirebaseEventType {
-    VALUE, CHILD_ADDED, CHILD_CHANGED, CHILD_REMOVED, CHILD_MOVED
-  }
+public class Route {
 
   private FirebaseEventType event;
   private URL src;

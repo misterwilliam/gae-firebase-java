@@ -8,6 +8,7 @@ import java.util.Arrays;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import com.example.GaeFirebase.ConfigService.RouteSpec.FirebaseEventType;
 import com.google.appengine.api.utils.SystemProperty;
 
 public class ServletContextListenerImpl implements ServletContextListener {
@@ -32,7 +33,7 @@ public class ServletContextListenerImpl implements ServletContextListener {
       ArrayList<Route> routes = new ArrayList<Route>();
       for (String src : srcUrls) {
         for (String dest : destUrls) {
-          routes.add(new Route(Route.FirebaseEventType.VALUE, new URL(src), new URL(dest)));
+          routes.add(new Route(FirebaseEventType.value, new URL(src), new URL(dest)));
         }
       }
 

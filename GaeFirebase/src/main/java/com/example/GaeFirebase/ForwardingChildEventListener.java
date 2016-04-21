@@ -2,6 +2,7 @@ package com.example.GaeFirebase;
 
 import java.util.logging.Logger;
 
+import com.example.GaeFirebase.ConfigService.RouteSpec.FirebaseEventType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firebase.client.ChildEventListener;
@@ -13,9 +14,9 @@ public class ForwardingChildEventListener implements ChildEventListener {
   private static final Logger log = Logger.getLogger(ForwardingChildEventListener.class.getName());
 
   Forwarder forwarder;
-  Route.FirebaseEventType eventType;
+  FirebaseEventType eventType;
 
-  public ForwardingChildEventListener(Forwarder forwarder, Route.FirebaseEventType eventType) {
+  public ForwardingChildEventListener(Forwarder forwarder, FirebaseEventType eventType) {
     this.forwarder = forwarder;
     this.eventType = eventType;
   }
@@ -27,7 +28,7 @@ public class ForwardingChildEventListener implements ChildEventListener {
 
   @Override
   public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
-    if (this.eventType != Route.FirebaseEventType.CHILD_ADDED) {
+    if (this.eventType != FirebaseEventType.child_added) {
       return;
     }
     if (snapshot.exists()) {
@@ -43,7 +44,7 @@ public class ForwardingChildEventListener implements ChildEventListener {
 
   @Override
   public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
-    if (this.eventType != Route.FirebaseEventType.CHILD_CHANGED) {
+    if (this.eventType != FirebaseEventType.child_changed) {
       return;
     }
     if (snapshot.exists()) {
@@ -59,7 +60,7 @@ public class ForwardingChildEventListener implements ChildEventListener {
 
   @Override
   public void onChildMoved(DataSnapshot snapshot, String previousChildName) {
-    if (this.eventType != Route.FirebaseEventType.CHILD_MOVED) {
+    if (this.eventType != FirebaseEventType.child_moved) {
       return;
     }
     if (snapshot.exists()) {
@@ -75,7 +76,7 @@ public class ForwardingChildEventListener implements ChildEventListener {
 
   @Override
   public void onChildRemoved(DataSnapshot snapshot) {
-    if (this.eventType != Route.FirebaseEventType.CHILD_REMOVED) {
+    if (this.eventType != FirebaseEventType.child_removed) {
       return;
     }
     if (snapshot.exists()) {

@@ -42,7 +42,7 @@ public class ConfigService {
 
   public static class RouteSpec {
     public enum FirebaseEventType {
-      VALUE, CHILD_ADDED, CHILD_CHANGED, CHILD_REMOVED, CHILD_MOVED, value, child_added, child_removed,
+      value, child_added, child_removed, child_changed, child_moved
     }
 
     public FirebaseEventType event;

@@ -49,14 +49,13 @@ public class FirebaseEventProxy {
     Forwarder forwarder = new Forwarder(dest, this.connectionAuthenticator);
 
     switch (route.getEvent()) {
-      case VALUE:
+      case value:
         src.addValueEventListener(new ForwardingValueEventListener(forwarder));
         break;
       default:
         src.addChildEventListener(new ForwardingChildEventListener(forwarder, route.getEvent()));
         break;
     }
-
   }
 
   private String getFirebaseAuthToken(String secret) {
