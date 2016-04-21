@@ -1,14 +1,13 @@
 package com.example.GaeFirebase;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import com.example.GaeFirebase.ConfigService.RouteSpec.FirebaseEventType;
+import com.example.GaeFirebase.ConfigService.RouteSpec;
 import com.google.appengine.api.utils.SystemProperty;
 
 public class ServletContextListenerImpl implements ServletContextListener {
@@ -16,30 +15,18 @@ public class ServletContextListenerImpl implements ServletContextListener {
   @Override
   public void contextInitialized(ServletContextEvent event) {
     try {
-      Iterable<String> srcUrls;
-      Iterable<String> destUrls;
+      String env;
       if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
-        srcUrls =
-            this.getSpaceSeparatedArgs(System.getProperty("GaeFirebaseProxy.prod.src.urls", ""));
-        destUrls =
-            this.getSpaceSeparatedArgs(System.getProperty("GaeFirebaseProxy.prod.dest.urls", ""));
+        env = "prod";
       } else {
-        srcUrls =
-            this.getSpaceSeparatedArgs(System.getProperty("GaeFirebaseProxy.dev.src.urls", ""));
-        destUrls =
-            this.getSpaceSeparatedArgs(System.getProperty("GaeFirebaseProxy.dev.dest.urls", ""));
+        env = "dev";
       }
 
-      ArrayList<Route> routes = new ArrayList<Route>();
-      for (String src : srcUrls) {
-        for (String dest : destUrls) {
-          routes.add(new Route(FirebaseEventType.value, new URL(src), new URL(dest)));
-        }
-      }
-
-      FirebaseEventProxy firebaseEventProxy = new FirebaseEventProxy(routes);
+      List<RouteSpec> routeSpecs =
+          ConfigService.GetRouteSpecs(new File("firebase_event_proxy_config.json"), env);
+      FirebaseEventProxy firebaseEventProxy = new FirebaseEventProxy(routeSpecs);
       firebaseEventProxy.subscribe();
-    } catch (MalformedURLException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -47,9 +34,5 @@ public class ServletContextListenerImpl implements ServletContextListener {
   @Override
   public void contextDestroyed(ServletContextEvent event) {
     // App Engine does not currently invoke this method.
-  }
-
-  private Iterable<String> getSpaceSeparatedArgs(String args) {
-    return Arrays.asList(args.split(" "));
   }
 }

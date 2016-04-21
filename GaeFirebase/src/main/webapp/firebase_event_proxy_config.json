@@ -8,7 +8,7 @@
                 "src": "https://fb-channel.firebaseio.com/clients",
                 "dest": 
                 {
-                    "url": "http://localhost:9000/_ah/channel/connected/",
+                    "url": "http://localhost:9000/api/presence/connected/",
                     "snapshotParam": "from"
                 }
             },
@@ -17,7 +17,7 @@
                 "src": "https://fb-channel.firebaseio.com/clients",
                 "dest": 
                 {
-                    "url": "http://localhost:9000/_ah/channel/disconnected/",
+                    "url": "http://localhost:9000/api/presence/disconnected/",
                     "snapshotParam": "from"
                 }
             }
@@ -28,11 +28,20 @@
         "routes": 
         [
             {
-                "event": "value",
+                "event": "child_added",
                 "src": "https://fb-channel.firebaseio.com/clients",
                 "dest": 
                 {
-                    "url": "http://gae-firebase-c4d3c.appspot.com/api/_presence/gae",
+                    "url": "http://gae-firebase-c4d3c.appspot.com/api/presence/connected",
+                    "snapshotParam": "from"
+                }
+            },
+            {
+                "event": "child_removed",
+                "src": "https://fb-channel.firebaseio.com/clients",
+                "dest": 
+                {
+                    "url": "http://gae-firebase-c4d3c.appspot.com/api/presence/disconnected",
                     "snapshotParam": "from"
                 }
             }

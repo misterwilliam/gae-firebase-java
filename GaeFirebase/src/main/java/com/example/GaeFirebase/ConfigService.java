@@ -2,6 +2,8 @@ package com.example.GaeFirebase;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -68,6 +70,10 @@ public class ConfigService {
     @Override
     public int hashCode() {
       return new HashCodeBuilder().append(event).append(src).append(dest).toHashCode();
+    }
+
+    public Route getRoute() throws MalformedURLException {
+      return new Route(this.event, new URL(this.src), new URL(this.dest.url));
     }
   }
 

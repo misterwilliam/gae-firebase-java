@@ -10,19 +10,10 @@
 
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
-
-        <property name="GaeFirebaseProxy.dev.src.urls"
-                  value="https://fb-channel.firebaseio.com/clients"/>
-        <property name="GaeFirebaseProxy.dev.dest.urls"
-                  value="http://localhost:9000/api/_presence/gae"/>
-                  
-        <property name="GaeFirebaseProxy.prod.src.urls"
-                  value="https://fb-channel.firebaseio.com/clients"/>
-        <property name="GaeFirebaseProxy.prod.dest.urls"
-                  value="http://gae-firebase-c4d3c.appspot.com/api/_presence/gae"/>
     </system-properties>
     <resource-files>
       <include path="/**.properties" />
+      <include path="firebase_event_proxy_config.json" />
       <include path="application_default_credentials.json" />
     </resource-files>
 </appengine-web-app>

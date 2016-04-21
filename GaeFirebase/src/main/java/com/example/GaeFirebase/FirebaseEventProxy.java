@@ -3,6 +3,7 @@ package com.example.GaeFirebase;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.example.GaeFirebase.ConfigService.RouteSpec;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -22,12 +24,10 @@ public class FirebaseEventProxy {
   private ArrayList<Route> routes;
   private static final Logger log = Logger.getLogger(FirebaseEventProxy.class.getName());
 
-  public FirebaseEventProxy(Iterable<Route> routes) {
-    log.info("Configuring routes");
+  public FirebaseEventProxy(Iterable<RouteSpec> routeSpecs) throws MalformedURLException {
     this.routes = new ArrayList<Route>();
-    for (Route route : routes) {
-      log.info(route.getSrc().toString() + " -> " + route.getDest().toString());
-      this.routes.add(route);
+    for (RouteSpec routeSpec : routeSpecs) {
+      routes.add(routeSpec.getRoute());
     }
 
     this.connectionAuthenticator =
