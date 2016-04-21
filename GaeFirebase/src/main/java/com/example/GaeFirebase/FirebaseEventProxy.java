@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import com.example.GaeFirebase.ConfigService.RouteSpec;
 import com.firebase.client.AuthData;
@@ -22,7 +21,6 @@ public class FirebaseEventProxy {
   private HttpURLConnectionAuthenticator connectionAuthenticator;
   private String firebaseAuthToken;
   private ArrayList<Route> routes;
-  private static final Logger log = Logger.getLogger(FirebaseEventProxy.class.getName());
 
   public FirebaseEventProxy(Iterable<RouteSpec> routeSpecs) throws MalformedURLException {
     this.routes = new ArrayList<Route>();
