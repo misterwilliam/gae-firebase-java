@@ -36,7 +36,8 @@ public class RouteSpec {
     return new HashCodeBuilder().append(event).append(src).append(dest).toHashCode();
   }
 
-  public Route getRoute() throws MalformedURLException {
-    return new Route(this.event, new URL(this.src), new URL(this.dest.url), this.dest);
+  public static Route MakeRoute(RouteSpec r, HttpURLConnectionAuthenticator httpAuthenticator)
+      throws MalformedURLException {
+    return new Route(r.event, new URL(r.src), new URL(r.dest.url), r.dest, httpAuthenticator);
   }
 }

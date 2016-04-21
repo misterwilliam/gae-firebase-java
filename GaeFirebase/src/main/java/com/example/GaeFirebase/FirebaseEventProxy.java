@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,20 +16,19 @@ import com.firebase.security.token.TokenGenerator;
 
 public class FirebaseEventProxy {
 
-  private HttpURLConnectionAuthenticator connectionAuthenticator;
   private String firebaseAuthToken;
   private ArrayList<Route> routes;
 
   public FirebaseEventProxy(Iterable<RouteSpec> routeSpecs) throws MalformedURLException {
-    this.routes = new ArrayList<Route>();
-    for (RouteSpec routeSpec : routeSpecs) {
-      routes.add(routeSpec.getRoute());
-    }
-
-    this.connectionAuthenticator =
+    HttpURLConnectionAuthenticator connectionAuthenticator =
         HttpURLConnectionAuthenticator.getDefaultConnectionAuthenticator();
     Properties props = this.getConfigProperties("secrets.properties");
     this.firebaseAuthToken = this.getFirebaseAuthToken(props.getProperty("firebaseSecret"));
+
+    this.routes = new ArrayList<Route>();
+    for (RouteSpec routeSpec : routeSpecs) {
+      routes.add(RouteSpec.MakeRoute(routeSpec, connectionAuthenticator));
+    }
   }
 
   public void subscribe() {
@@ -40,12 +38,9 @@ public class FirebaseEventProxy {
   }
 
   private void subscribeToRoute(Route route) {
-    final URL dest = route.getDest();
     Firebase src =
         this.getAuthenticatedFirebaseClient(route.getSrc().toString(), this.firebaseAuthToken);
-    Forwarder forwarder = new Forwarder(dest, this.connectionAuthenticator);
-
-    route.listen(src, forwarder);
+    route.listen(src);
   }
 
   private String getFirebaseAuthToken(String secret) {

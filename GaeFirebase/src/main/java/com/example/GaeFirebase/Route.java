@@ -11,12 +11,15 @@ public class Route {
   private URL src;
   private URL dest;
   private DestSpec destSpec;
+  private HttpURLConnectionAuthenticator httpAuthenticator;
 
-  public Route(FirebaseEventType event, URL src, URL dest, DestSpec destSpec) {
+  public Route(FirebaseEventType event, URL src, URL dest, DestSpec destSpec,
+      HttpURLConnectionAuthenticator httpAuthenticator) {
     this.event = event;
     this.src = src;
     this.dest = dest;
     this.destSpec = destSpec;
+    this.httpAuthenticator = httpAuthenticator;
   }
 
   public URL getSrc() {
@@ -31,7 +34,8 @@ public class Route {
     return this.event;
   }
 
-  public void listen(Firebase src, Forwarder forwarder) {
+  public void listen(Firebase src) {
+    Forwarder forwarder = new Forwarder(this.dest, this.httpAuthenticator);
     switch (this.event) {
       case value:
         src.addValueEventListener(new ForwardingValueEventListener(forwarder));
