@@ -37,6 +37,6 @@ public class RouteSpec {
   }
 
   public Route getRoute() throws MalformedURLException {
-    return new Route(this.event, new URL(this.src), new URL(this.dest.url));
+    return new Route(this.event, new URL(this.src), new URL(this.dest.url), this.dest);
   }
 }
